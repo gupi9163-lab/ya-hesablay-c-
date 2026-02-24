@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Doğum gününüzü daxil edin və yaşınızı, yaşadığınız günləri və növbəti ad gününüzə qalan vaxtı öyrənin">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Yaş Hesablayıcı">
+    
+    <title>Yaş Hesablayıcı - Doğum günü və yaş məlumatları</title>
+    
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-512.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-dark: #4338CA;
+            --secondary: #10B981;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --border: #E5E7EB;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .install-button {
+            display: none;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 20px auto;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: #059669;
+        }
+
+        .install-button.show {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .calculate-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            display: none;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .result-item h3 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-item .value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .result-item .subvalue {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .error-message {
+            background: #FEE2E2;
+            color: #991B1B;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            border-left: 4px solid #DC2626;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #DC2626;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            z-index: 1000;
+        }
+
+        .offline-indicator.show {
+            display: block;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .card {
+                padding: 25px;
+            }
+
+            .result-item .value {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎂 Yaş Hesablayıcı</h1>
+            <p>Yaşınızı və daha çox məlumatı öyrənin</p>
+        </header>
+
+        <button id="installButton" class="install-button">
+            📱 Tətbiq kimi quraşdır
+        </button>
+
+        <div class="card">
+            <div class="input-group">
+                <label for="birthdate">Doğum gününüz (GG.AA.İİİİ):</label>
+                <input 
+                    type="text" 
+                    id="birthdate" 
+                    class="date-input" 
+                    placeholder="Məsələn: 15.06.1990"
+                    maxlength="10"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button id="calculateBtn" class="calculate-btn">
+                ✨ Hesabla
+            </button>
+
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+
+        <div id="results" class="results">
+            <div class="result-item">
+                <h3>Yaşınız</h3>
+                <div class="value" id="age"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Yaşadığınız gün sayı</h3>
+                <div class="value" id="totalDays"></div>
+                <div class="subvalue" id="additionalTime"></div>
+            </div>
+
+            <div class="result-item">
+                <h3>Növbəti ad gününə qalan vaxt</h3>
+                <div class="value" id="nextBirthday"></div>
+                <div class="subvalue" id="nextBirthdayDate"></div>
+            </div>
+        </div>
+
+        <div id="offlineIndicator" class="offline-indicator">
+            📡 Offline rejimdəsiniz
+        </div>
+
+        <footer class="footer">
+            <p>© 2024 Yaş Hesablayıcı - PWA Tətbiqi</p>
+        </footer>
+    </div>
+
+    <script>
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const birthdateInput = document.getElementById('birthdate');
+        const results = document.getElementById('results');
+        const errorMessage = document.getElementById('errorMessage');
+        const offlineIndicator = document.getElementById('offlineIndicator');
+
+        // Service Worker qeydiyyatı
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered:', registration.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+
+        // Install düyməsi
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.classList.add('show');
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            if (outcome === 'accepted') {
+                console.log('Tətbiq quraşdırıldı');
+            }
+            
+            deferredPrompt = null;
+            installButton.classList.remove('show');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('Tətbiq uğurla quraşdırıldı');
+            installButton.classList.remove('show');
+        });
+
+        // Online/Offline status
+        window.addEventListener('online', () => {
+            offlineIndicator.classList.remove('show');
+        });
+
+        window.addEventListener('offline', () => {
+            offlineIndicator.classList.add('show');
+        });
+
+        // Tarix format etmə (GG.AA.İİİİ)
+        birthdateInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '.' + value.slice(2);
+            }
+            if (value.length >= 5) {
+                value = value.slice(0, 5) + '.' + value.slice(5);
+            }
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+            
+            e.target.value = value;
+        });
+
+        birthdateInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                calculateAge();
+            }
+        });
+
+        calculateBtn.addEventListener('click', calculateAge);
+
+        function calculateAge() {
+            const input = birthdateInput.value.trim();
+            
+            // Tarix formatını yoxla
+            const dateRegex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
+            const match = input.match(dateRegex);
+            
+            if (!match) {
+                showError('Zəhmət olmasa, tarixi GG.AA.İİİİ formatında daxil edin (məsələn: 15.06.1990)');
+                return;
+            }
+            
+            const day = parseInt(match[1]);
+            const month = parseInt(match[2]);
+            const year = parseInt(match[3]);
+            
+            // Tarix düzgünlüyünü yoxla
+            if (month < 1 || month > 12) {
+                showError('Ay 1-12 arasında olmalıdır');
+                return;
+            }
+            
+            if (day < 1 || day > 31) {
+                showError('Gün 1-31 arasında olmalıdır');
+                return;
+            }
+            
+            const birthDate = new Date(year, month - 1, day);
+            
+            // Düzgün tarix olub-olmadığını yoxla
+            if (birthDate.getDate() !== day || birthDate.getMonth() !== month - 1 || birthDate.getFullYear() !== year) {
+                showError('Daxil etdiyiniz tarix düzgün deyil');
+                return;
+            }
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (birthDate > today) {
+                showError('Doğum tarixi gələcəkdə ola bilməz');
+                return;
+            }
+            
+            if (year < 1900) {
+                showError('Doğum ili 1900-dən kiçik ola bilməz');
+                return;
+            }
+            
+            // Hesablamalar
+            hideError();
+            
+            // Yaş hesabla
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+            
+            // Yaşadığı günlər
+            const diffTime = Math.abs(today - birthDate);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            const diffHours = Math.floor((diffTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffTime % (1000 * 60 * 60)) / (1000 * 60));
+            
+            // Növbəti doğum günü
+            let nextBirthday = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            
+            if (nextBirthday <= today) {
+                nextBirthday.setFullYear(today.getFullYear() + 1);
+            }
+            
+            const daysUntilBirthday = Math.ceil((nextBirthday - today) / (1000 * 60 * 60 * 24));
+            const monthsUntilBirthday = Math.floor(daysUntilBirthday / 30);
+            const remainingDays = daysUntilBirthday % 30;
+            
+            // Nəticələri göstər
+            document.getElementById('age').textContent = age + ' yaş';
+            document.getElementById('totalDays').textContent = diffDays.toLocaleString('az-AZ') + ' gün';
+            document.getElementById('additionalTime').textContent = `(${diffHours} saat və ${diffMinutes} dəqiqə)`;
+            
+            if (daysUntilBirthday === 0) {
+                document.getElementById('nextBirthday').textContent = '🎉 Bugün!';
+                document.getElementById('nextBirthdayDate').textContent = 'Ad gününüz mübarək!';
+            } else if (daysUntilBirthday === 1) {
+                document.getElementById('nextBirthday').textContent = '1 gün';
+                document.getElementById('nextBirthdayDate').textContent = formatDate(nextBirthday);
+            } else {
+                if (monthsUntilBirthday > 0) {
+                    document.getElementById('nextBirthday').textContent = 
+                        `${monthsUntilBirthday} ay və ${remainingDays} gün`;
+                } else {
+                    document.getElementById('nextBirthday').textContent = `${daysUntilBirthday} gün`;
+                }
+                document.getElementById('nextBirthdayDate').textContent = formatDate(nextBirthday);
+            }
+            
+            results.classList.add('show');
+        }
+
+        function formatDate(date) {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            results.classList.remove('show');
+        }
+
+        function hideError() {
+            errorMessage.classList.remove('show');
+        }
+
+        // İlk yükləmədə offline status yoxla
+        if (!navigator.onLine) {
+            offlineIndicator.classList.add('show');
+        }
+    </script>
+</body>
+</html>
