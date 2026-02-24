@@ -1,0 +1,40 @@
+{
+  "services": [
+    {
+      "type": "static_site",
+      "name": "yas-hesablayici",
+      "env": "static",
+      "buildCommand": "",
+      "staticPublishPath": ".",
+      "headers": [
+        {
+          "path": "/*",
+          "name": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/index.html",
+          "name": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "path": "/sw.js",
+          "name": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "path": "/manifest.json",
+          "name": "Cache-Control",
+          "value": "no-cache"
+        }
+      ],
+      "routes": [
+        {
+          "type": "rewrite",
+          "source": "/*",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}
